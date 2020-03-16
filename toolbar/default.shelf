@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <toolshelf name="mga" label="MGA">
+    <memberTool name="tool_1"/>
+  </toolshelf>
+
+  <tool name="RS_aov" label="RS aov" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import Redshift_ROP
+reload(Redshift_ROP)
+
+Redshift_ROP.aov()]]></script>
+  </tool>
+
+  <tool name="RS_rm_technical" label="RS_rm_tech" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import Redshift_ROP
+reload(Redshift_ROP)
+
+Redshift_ROP.remove_aov()]]></script>
+  </tool>
+
+  <tool name="RS_AOVs" label="RS AOV" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[from PySide2 import QtWidgets
+import hou
+import rs_rop
+import rs_rop_aov
+reload(rs_rop)
+reload(rs_rop_aov)
+
+aov_dialog = QtWidgets.QDialog(hou.ui.mainQtWindow())
+aov_dialog.setWindowTitle('RS AOV')
+aov = rs_rop.RS_AOV(rs_rop_aov.aov_primary, rs_rop_aov.aov_secondary, rs_rop_aov.aov_technical, rs_rop_aov.aov_motion, rs_rop_aov.aov_crypto)
+layout = QtWidgets.QVBoxLayout()
+layout.addWidget(aov)
+aov_dialog.setLayout(layout)
+aov_dialog.show()
+aov_dialog.setFixedSize(aov_dialog.size())]]></script>
+  </tool>
+
+  <tool name="tool_1" label="RS Settings" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[from PySide2 import QtWidgets
+import hou
+import rs_rop
+import rs_rop_aov
+import rs_rop_parms
+reload(rs_rop)
+reload(rs_rop_aov)
+reload(rs_rop_parms)
+
+dialog = QtWidgets.QDialog(hou.ui.mainQtWindow())
+dialog.setWindowTitle('RS Settings')
+layout = QtWidgets.QVBoxLayout()
+dialog.setLayout(layout)
+
+settings = rs_rop.RS_Settings()
+aov = rs_rop.RS_AOV(rs_rop_aov.aov_primary, rs_rop_aov.aov_secondary, rs_rop_aov.aov_technical, rs_rop_aov.aov_motion, rs_rop_aov.aov_crypto)
+layout.addWidget(settings)
+layout.addWidget(aov)
+
+dialog.show()
+dialog.setFixedSize(dialog.size())]]></script>
+  </tool>
+</shelfDocument>
