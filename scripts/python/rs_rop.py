@@ -19,7 +19,7 @@ def create_aov_mat(context='/out/'):
         p_rest = matnet.createNode('redshift_vopnet', p_rest_name)
 
         user_data = p_rest.createNode('redshift::RSUserDataVector', 'rest')
-        user_data.parm('attribute').set('rest')
+        user_data.parm('attribute').set('P_rest')
         store_color = p_rest.createNode('redshift::StoreColorToAOV', 'store')
         store_color.setInput(0, user_data)
         store_color.setInput(1, user_data)
@@ -72,11 +72,10 @@ def RS_addAovs(n, *args):
             n.parm(parm).set(val)
 
 def RS_removeAovs(n, *args):
-    for aov_group in args:
-        for aov in aov_group:
-            i = RS_aovExists(n, aov['RS_aovID'], aov['RS_aovSuffix'])
-            if i != 0:
-                n.parm('RS_aov').removeMultiParmInstance(i-1)
+    for aov in args:
+        i = RS_aovExists(n, aov['RS_aovID'], aov['RS_aovSuffix'])
+        if i != 0:
+            n.parm('RS_aov').removeMultiParmInstance(i-1)
 
 def RS_aovExists(n, aovID, aovSuffix):
     count = RS_aov_count(n)
@@ -265,6 +264,10 @@ class RS_AOV(QtWidgets.QWidget):
         btn_layout.addWidget(self.btn_clear)
         self.btn_clear.clicked.connect(self.clear)
 
+        self.btn_remove = QtWidgets.QPushButton('ROP Remove')
+        btn_layout.addWidget(self.btn_remove)
+        self.btn_remove.clicked.connect(self.remove)
+
         self.btn_add = QtWidgets.QPushButton('ROP Add')
         btn_layout.addWidget(self.btn_add)
         self.btn_add.clicked.connect(self.add)
@@ -294,6 +297,19 @@ class RS_AOV(QtWidgets.QWidget):
                                 for n in nodes:
                                     RS_addAovs(n, aov.data['parms'])
         create_aov_mat()
+
+    def remove(self):
+        nodes = RS_ROP_nodes()
+        all_aovs = self.aovs
+        ch = all_aovs.children()
+        for cat in all_aovs.children():
+            if isinstance(cat, QtWidgets.QGroupBox):
+                if cat.isChecked():
+                    for aov in cat.children():
+                        if isinstance(aov, QtWidgets.QCheckBox):
+                            if aov.isChecked():
+                                for n in nodes:
+                                    RS_removeAovs(n, aov.data['parms'])
 
 
     def replace(self):
