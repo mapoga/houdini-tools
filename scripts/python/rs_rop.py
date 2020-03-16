@@ -1,6 +1,7 @@
 import hou
 from PySide2 import QtCore
 from PySide2 import QtWidgets
+import rs_rop_aov
 import rs_rop_parms
 
 def create_aov_mat(context='/out/'):
@@ -54,7 +55,6 @@ def create_aov_mat(context='/out/'):
     N2.layoutChildren(N2.children())
 
     matnet.layoutChildren(matnet.children())
-
 
 def setParms(n, args):
     for key, val in args.items():
@@ -361,3 +361,34 @@ class RS_AOV(QtWidgets.QWidget):
         vertical.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding))
         grp.setChecked(cat['enabled'])
         return grp
+
+
+def RS_ROP_onCreate(n):
+    aovs_cat = [rs_rop_aov.aov_primary,
+            rs_rop_aov.aov_secondary,
+            rs_rop_aov.aov_technical,
+            rs_rop_aov.aov_motion,
+            rs_rop_aov.aov_crypto]
+
+    parms_cat = [rs_rop_parms.outputCommon,
+             rs_rop_parms.motionBlur,
+             rs_rop_parms.GI,
+             ]
+    sampling = rs_rop_parms.sampling
+
+    for aov_cat in aovs_cat:
+        if aov_cat['enabled']:
+            for aov in aov_cat['aovs']:
+                if aov['enabled']:
+                    RS_addAovs(n, aov['parms'])
+
+    for parm_cat in parms_cat:
+        if parm_cat['enabled']:
+            setParms(n, parm_cat['parms'])
+
+    for quality in sampling['quality']:
+        try:
+            if quality['checked']:
+                setParms(n, quality['parms'])
+        except:
+            pass
